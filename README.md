@@ -1,2 +1,4 @@
-# IoT_Air_Sensor
-IoT course project. An air sensor application
+# Air Sensor Detector
+
+1. Air Sensor Detector is an IoT Project for Sensing the composition of toxic substances in an environment deployed with the COAP and MQTT architecture sensors and actuators.
+
