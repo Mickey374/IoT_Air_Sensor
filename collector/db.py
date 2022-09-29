@@ -12,9 +12,9 @@ class Database:
         else:
             # Connect to the database
             self.connection = pymysql.connect(host='localhost',
-                                        user='root',
-                                        password='',
-                                        database='airsensor',
+                                        user='user',
+                                        password='admin@374',
+                                        database='air_sensor_iot',
                                         charset='utf8mb4',
                                         cursorclass=pymysql.cursors.DictCursor)
             return self.connection
