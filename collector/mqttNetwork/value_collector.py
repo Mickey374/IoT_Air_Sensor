@@ -29,6 +29,7 @@ class MqttClientProfile:
             query = "INSERT INTO `node_data` (`node_id`, `timestamp`, `temperature`, `humidity`,  `carbon_monoxide`) VALUES (%s, %s, %s, %s, %s)"
             cursor.execute(query, (node_ID, curr_date, temperature, humidity, carbon_monoxide))
             self.connection.commit()
+            self.checkActuatorFan(temperature, humidity, carbon_monoxide)
         
         elif msg.topic == "temp_status_out":
             self.message1 = msg.payload
@@ -36,10 +37,9 @@ class MqttClientProfile:
             node_ID = data["node"]
             tempOut = data["tempOut"]
             self.tempOut = tempOut
+            self.checkActuatorFilter(tempOut)
+        
 
-
-
-        # print(msg.topic+" "+str(msg.payload))
 
     client = mqtt.Client()
     client.on_connect = on_connect
