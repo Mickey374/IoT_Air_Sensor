@@ -1,4 +1,5 @@
 from datetime import datetime
+from coapNetwork.addresses import Addresses
 import json
 import paho.mqtt.client as mqtt
 from database.db import Database
@@ -38,7 +39,35 @@ class MqttClientProfile:
             tempOut = data["tempOut"]
             self.tempOut = tempOut
             self.checkActuatorFilter(tempOut)
-        
+    
+    #Function to get most recent state of each actuator
+    def executeCurrentState(self, address, table, col):
+        cursor = self.connection.cursor()
+        query = "SELECT * FROM actuator_"+table+" WHERE address=%s ORDER BY timestamp DESC LIMIT 1"
+        cursor.execute(query, str(address))
+        all_results = cursor.fetchall()
+        if not all_results:
+            return None
+        else:
+            for row in all_results:
+                return row[col]
+
+
+    
+    #Function declaration to open and close the Filters
+    def openFilters(self):
+        for curr_add in Addresses.ad_Filters:
+            open = self.executeCurrentState(curr_add, "filter", "status")
+            manual =self.executeCurrentState(curr_add, "filter", "manual")
+
+            if manual=='1' and open!='0':
+                return
+            if open is not None:
+                if open =="0":
+                    open=="1"
+                
+
+
 
 
     client = mqtt.Client()
