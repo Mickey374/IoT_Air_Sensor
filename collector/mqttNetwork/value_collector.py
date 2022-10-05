@@ -64,9 +64,15 @@ class MqttClientProfile:
             elif str(status) == "0":
                 globalStatus.setFilterStatus(0)
                 self.client.publish("actuator_data", "Closed")
-        # return
+        elif type == "initFan":
+            if str(status) == "1":
+                globalStatus.setFanStatus(1)
+                self.client.publish("actuator_data", "startFan")
+            elif str(status) == "0":
+                globalStatus.setFanStatus(0)
+                self.client.publish("actuator_data", "stopFan")            
 
-    
+
     #Function declaration to open and close the Filters
     def openFilters(self):
         for curr_add in Addresses.ad_Filters:
@@ -93,14 +99,14 @@ class MqttClientProfile:
                 open = "1"
                 success = Post.getStatusFilters(curr_add, open)
                 if success == 1:
-                        dt = datetime.now()
-                        cursor = self.connection.cursor()
-                        query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
-                        cursor.execute(query, (str(curr_add), dt, open))
-                        if globalStatus.changeVal == 0:
-                            print("\n ☢️☢️☢️ OPENING FILTERS... ☢️☢️☢️\n")
-                        self.connection.commit()
-                        self.communicateToSensors("1", "filter")
+                    dt = datetime.now()
+                    cursor = self.connection.cursor()
+                    query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
+                    cursor.execute(query, (str(curr_add), dt, open))
+                    if globalStatus.changeVal == 0:
+                        print("\n ☢️☢️☢️ OPENING FILTERS... ☢️☢️☢️\n")
+                    self.connection.commit()
+                    self.communicateToSensors("1", "filter")
 
     
     def closeFilters(self):
@@ -121,6 +127,39 @@ class MqttClientProfile:
                             print("\n 🚫🚫🚫 CLOSING FILTERS... 🚫🚫🚫\n")
                         self.connection.commit()
                         self.communicateToSensors("0", "filter")
+
+    #Function to start fan within the environment
+    def startFan(self):
+        for curr_add in Addresses.ad_Fans:
+            status = self.executeCurrentState(curr_add, "fanning", "status")
+            manual = self.executeCurrentState(curr_add, "fanning", "manual")
+            if manual == "1" and status !="0":
+                return
+            if status is None:
+                status = "1"
+                success = Post.getStatusFilters(curr_add, status)
+                if success == 1:
+                    dt = datetime.now()
+                    cursor = self.connection.cursor()
+                    query = "INSERT INTO `actuator_fan` (`address`,`timestamp`,`status`) VALUES (%s, %s, %s)"
+                    cursor.execute(query, (str(curr_add), dt, status))
+                    if globalStatus.changeVal == 0:
+                        print("\n ☢💨😌 STARTING FAN... ☢💨😌\n")
+                    self.connection.commit()
+                    self.communicateToSensors(status, "initFan")
+            
+            if status == "0":
+                status = "1"
+                success = Post.getStatusFilters(curr_add, status)
+                if success == 1:
+                    dt = datetime.now()
+                    cursor = self.connection.cursor()
+                    query = "INSERT INTO `actuator_fan` (`address`,`timestamp`,`status`) VALUES (%s, %s, %s)"
+                    cursor.execute(query, (str(curr_add), dt, status))
+                    if globalStatus.changeVal == 0:
+                        print("\n ☢💨😌 STARTING FAN... ☢💨😌\n")
+                    self.connection.commit()
+                    self.communicateToSensors(status, "initFan")
 
 
 
