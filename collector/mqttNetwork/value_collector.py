@@ -60,7 +60,7 @@ class MqttClientProfile:
             open = self.executeCurrentState(curr_add, "filter", "status")
             manual =self.executeCurrentState(curr_add, "filter", "manual")
 
-            if manual=='1' and open!='0':
+            if manual=='1' and open != '0':
                 return
             if open is not None:
                 if open =="0":
