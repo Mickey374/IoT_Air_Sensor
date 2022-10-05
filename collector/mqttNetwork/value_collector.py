@@ -3,6 +3,8 @@ from coapNetwork.addresses import Addresses
 import json
 import paho.mqtt.client as mqtt
 from database.db import Database
+from coapNetwork.sendPost import Post
+from globalStatus import globalStatus
 
 class MqttClientProfile:
     # The callback for when the client receives a CONNACK response from the server.
@@ -65,6 +67,18 @@ class MqttClientProfile:
             if open is not None:
                 if open =="0":
                     open=="1"
+                    success = Post.getStatusFilters(curr_add, open)
+                    if success == 1:
+                        dt = datetime.now()
+                        cursor = self.connection.cursor()
+                        query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
+                        cursor.execute(query, (str(curr_add), dt, open))
+                        if globalStatus.changeVal == 0:
+                            print("\n ☢️☢️☢️ OPENING FILTERS ☢️☢️☢️\n")
+                        self.connection.commit()
+                        self.communicateToSensors("1", "filter")
+                        
+
                 
 
 
