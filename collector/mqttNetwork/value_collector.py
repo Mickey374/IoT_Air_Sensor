@@ -137,20 +137,20 @@ class MqttClientProfile:
                 return
             if status is None:
                 status = "1"
-                success = Post.getStatusFilters(curr_add, status)
+                success = Post.getStatusFan(curr_add, status)
                 if success == 1:
                     dt = datetime.now()
                     cursor = self.connection.cursor()
                     query = "INSERT INTO `actuator_fan` (`address`,`timestamp`,`status`) VALUES (%s, %s, %s)"
                     cursor.execute(query, (str(curr_add), dt, status))
                     if globalStatus.changeVal == 0:
-                        print("\n ☢💨😌 STARTING FAN... ☢💨😌\n")
+                        print("\n ☢🌀😌 STARTING FAN... ☢🌀😌\n")
                     self.connection.commit()
                     self.communicateToSensors(status, "initFan")
             
             if status == "0":
                 status = "1"
-                success = Post.getStatusFilters(curr_add, status)
+                success = Post.getStatusFan(curr_add, status)
                 if success == 1:
                     dt = datetime.now()
                     cursor = self.connection.cursor()
@@ -161,8 +161,24 @@ class MqttClientProfile:
                     self.connection.commit()
                     self.communicateToSensors(status, "initFan")
 
-
-
+    def stopFan(self):
+        for curr_add in Addresses.ad_Fans:
+            status = self.executeCurrentState(str(curr_add), "fanning", "status")
+            manual = self.executeCurrentState(str(curr_add), "fanning", "manual")
+            if manual == "1" and status != "0":
+                return
+            if status == "1":
+                status = "0"
+                success = Post.getStatusFan(curr_add, status)
+                if success == 1:
+                    dt = datetime.now()
+                    cursor = self.connection.cursor()
+                    query = "INSERT INTO `actuator_fan` (`address`,`timestamp`,`status`) VALUES (%s, %s, %s)"
+                    cursor.execute(query, (str(curr_add), dt, status))
+                    if globalStatus.changeVal == 0:
+                        print("\n ☢🔌⏹️ STOPPING FAN... ☢🔌⏹️\n")
+                    self.connection.commit()
+                    self.communicateToSensors(status, "initFan")
 
 
 
