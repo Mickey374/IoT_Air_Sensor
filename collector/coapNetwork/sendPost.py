@@ -23,3 +23,11 @@ class Post:
             return 1
         else:
             return 0
+    
+    def getStatusFan(ad, status):
+        res = Post.getClients(ad).post("cooling", "mode="+status)
+
+        if res.code == 67:
+            return 1
+        else:
+            return 0
