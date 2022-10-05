@@ -1,3 +1,4 @@
+from ast import Add
 from datetime import datetime
 from coapNetwork.addresses import Addresses
 import json
@@ -97,11 +98,31 @@ class MqttClientProfile:
                         query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
                         cursor.execute(query, (str(curr_add), dt, open))
                         if globalStatus.changeVal == 0:
-                            print("\n ☢️☢️☢️ OPENING FILTERS ☢️☢️☢️\n")
+                            print("\n ☢️☢️☢️ OPENING FILTERS... ☢️☢️☢️\n")
                         self.connection.commit()
                         self.communicateToSensors("1", "filter")
 
-                
+    
+    def closeFilters(self):
+        for curr_add in Addresses.ad_Filters:
+            open = self.executeCurrentState(curr_add, "filter", "Status")
+            manual = self.executeCurrentState(curr_add, "filter", "manual")
+            if manual == "1" and open != "0":
+                return
+            if open == "1":
+                open = "0"
+                success = Post.getStatusFilters(curr_add, open)
+                if success == 1:
+                        dt = datetime.now()
+                        cursor = self.connection.cursor()
+                        query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
+                        cursor.execute(query, (str(curr_add), dt, open))
+                        if globalStatus.changeVal == 0:
+                            print("\n 🚫🚫🚫 CLOSING FILTERS... 🚫🚫🚫\n")
+                        self.connection.commit()
+                        self.communicateToSensors("0", "filter")
+
+
 
 
 
