@@ -54,6 +54,16 @@ class MqttClientProfile:
             for row in all_results:
                 return row[col]
 
+    #Function to communicate to the Sensors to Initiate  Action based on change
+    def communicateToSensors(self, status, type):
+        if type == "filter":
+            if str(status) == "1":
+                globalStatus.setFilterStatus(1)
+                self.client.publish("actuator_data", "Open")
+            elif str(status) == "0":
+                globalStatus.setFilterStatus(0)
+                self.client.publish("actuator_data", "Closed")
+        # return
 
     
     #Function declaration to open and close the Filters
