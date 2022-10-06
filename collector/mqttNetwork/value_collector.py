@@ -72,8 +72,7 @@ class MqttClientProfile:
                 globalStatus.setFanStatus(0)
                 self.client.publish("actuator_data", "stopFan")            
 
-
-    #Function declaration to open and close the Filters
+    # ======= Function declaration to open and close the Filters ==========
     def openFilters(self):
         for curr_add in Addresses.ad_Filters:
             open = self.executeCurrentState(curr_add, "filter", "status")
@@ -107,7 +106,6 @@ class MqttClientProfile:
                         print("\n ☢️☢️☢️ OPENING FILTERS... ☢️☢️☢️\n")
                     self.connection.commit()
                     self.communicateToSensors("1", "filter")
-
     
     def closeFilters(self):
         for curr_add in Addresses.ad_Filters:
@@ -128,7 +126,7 @@ class MqttClientProfile:
                         self.connection.commit()
                         self.communicateToSensors("0", "filter")
 
-    #Function to start fan within the environment
+    # ======== Function to start fan within the environment =============
     def startFan(self):
         for curr_add in Addresses.ad_Fans:
             status = self.executeCurrentState(curr_add, "fanning", "status")
@@ -180,6 +178,8 @@ class MqttClientProfile:
                     self.connection.commit()
                     self.communicateToSensors(status, "initFan")
 
+    # ======== Checking if Actuators should be started =========
+    
 
 
     client = mqtt.Client()
