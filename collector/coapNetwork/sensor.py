@@ -57,5 +57,17 @@ class ObserveSensor:
             
 
         #If the type is 1
+        elif self.type == 1:
+            status = data["open"]
+            dt = datetime.now()
+            self.executeQuery(self.address, status, dt, "fan")
 
+            if str(status) == "1":
+                if globalStatus.changeVal == 0: print("\n ☢️☢️ STARTING FAN")
+                globalStatus.setFilterStatus(1)
+                self.mqtt.communicateToSensors(status, "fan")
 
+            elif str(status) == "0":
+                if globalStatus.changeVal == 0: print("\n DEFAULT STATE:: WAITING")
+                globalStatus.changeVal(0)
+                self.mqtt.communicateToSensors(status, "fan")
