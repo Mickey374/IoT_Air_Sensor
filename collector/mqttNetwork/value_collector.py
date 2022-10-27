@@ -179,6 +179,11 @@ class MqttClientProfile:
                     self.communicateToSensors(status, "initFan")
 
     # ======== Checking if Actuators should be started =========
+    def shouldStartFan(self, temp, hum, max_temp, max_hum, min_hum):
+        if temp > max_temp and hum < max_hum: return True
+        if hum < min_hum: return True
+        return False
+    
     
 
 
