@@ -241,8 +241,24 @@ class MqttClientProfile:
         self.humIn = None
         self.type = type
 
-        
+        if type == "check":
+            print("\n MQTT Client Starting ...Temperature | Humidity | CO2")
 
+        self.client = mqtt.Client()
+        self.client.on_connect = self.on_connect
+
+        if type == "check":
+            self.client.on_message = self.on_message
+        
+        try:
+            self.client.connect("127.0.0.1", 1883, 60)
+        except Exception as e:
+            print(str(e))
+        
+        if type == "check":
+            self.client.loop_forever()
+
+            
     # client = mqtt.Client()
     # client.on_connect = on_connect
     # client.on_message = on_message
