@@ -29,6 +29,20 @@ class ObserveSensor:
         self.mqtt.mqtt_client(None, None, None, None, None, None, "communicate")
         self.client.observe(self.resource, self.observer)
     
-    def observer():
-        
+    def executeQuery(self, add, stat, timestamp, table):
+        with self.connection.cursor() as cursor:
+            cursor = self.connection.cursor()
+            query = "INSERT INTO actuator_"+ table + "(`address`, `timestamp`, `status`, `manual`) VALUES (%s, %s, %s, %s)"
+            cursor.execute(query, (str(add), timestamp, stat, "1"))
+            self.connection.commit()
+
+    def observer(self, response):
+        data = json.loads(response.payload)
+
+
+        #If the type is 0
+
+
+        #If the type is 1
+
 

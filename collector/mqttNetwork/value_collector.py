@@ -1,4 +1,3 @@
-from ast import Add
 from datetime import datetime
 from http import client
 from coapNetwork.addresses import Addresses
