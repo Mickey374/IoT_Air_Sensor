@@ -184,6 +184,12 @@ class MqttClientProfile:
         if hum < min_hum: return True
         return False
     
+    def checkActuatorFan(self, temp, hum, co2):
+        if self.shouldStartFan(int(temp), int(hum), self.max_temp, self.max_hum, self.min_hum):
+            self.startFan()
+        else:
+            self.stopFan()
+    
     
 
 
