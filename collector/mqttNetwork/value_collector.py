@@ -1,5 +1,6 @@
 from ast import Add
 from datetime import datetime
+from http import client
 from coapNetwork.addresses import Addresses
 import json
 import paho.mqtt.client as mqtt
@@ -221,15 +222,35 @@ class MqttClientProfile:
             self.closeFilters()
 
 
+    client = None
+    def mqtt_client(self, max_temp, min_temp, max_hum, min_hum, max_co2, min_co2, type):
+        self.db = Database()
+        self.connection = self.db.connect()
+        self.message = ""
+        self.message1 = ""
+        self.data = {}
+        self.max_temp = max_temp
+        self.min_temp = min_temp
+        self.max_co2 = max_co2
+        self.min_co2 = min_co2
+        self.max_hum = max_hum
+        self.min_hum = min_hum
+        self.tempIn = None
+        self.tempOut = None
+        self.co2In = None
+        self.humIn = None
+        self.type = type
 
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
+        
 
-    client.connect("mqtt.eclipseprojects.io", 1883, 60)
+    # client = mqtt.Client()
+    # client.on_connect = on_connect
+    # client.on_message = on_message
+
+    # client.connect("mqtt.eclipseprojects.io", 1883, 60)
 
     # Blocking call that processes network traffic, dispatches callbacks and
     # handles reconnecting.
     # Other loop*() functions are available that give a threaded interface and a
     # manual interface.
-    client.loop_forever()
+    # client.loop_forever()
