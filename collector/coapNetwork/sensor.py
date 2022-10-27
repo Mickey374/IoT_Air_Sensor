@@ -38,10 +38,23 @@ class ObserveSensor:
 
     def observer(self, response):
         data = json.loads(response.payload)
-
-
+        
         #If the type is 0
+        if self.type == 0:
+            status = data["status"]
+            dt = datetime.now()
+            self.executeQuery(self.address, status, dt, "filtering")
 
+            if str(status) == "1":
+                if globalStatus.changeVal == 0: print("\n ☢️☢️ STARTING FILTERING PROCESS. ☢️☢️")
+                globalStatus.setFilterStatus(1)
+                self.mqtt.communicateToSensors(status, "filter")
+
+            elif str(status) == "0":
+                if globalStatus.changeVal == 0: print("\n DEFAULT STATE:: WAITING")
+                globalStatus.changeVal(0)
+                self.mqtt.communicateToSensors(status, "filter")
+            
 
         #If the type is 1
 
