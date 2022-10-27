@@ -190,7 +190,24 @@ class MqttClientProfile:
         else:
             self.stopFan()
     
-    
+    def checkActuatorFilters(self, tempOut):
+        open_temp = 0
+        open_co2 = 0
+
+        #Control logic for controlling the temperature values
+        if self.tempIn == None or self.tempOut == None or self.co2In == None:
+            return
+        if self.tempIn > self.max_temp and self.tempIn > tempOut:
+            open_temp = 1
+        elif self.tempIn > self.min_temp and self.tempIn > tempOut:
+            open_temp = 0
+        
+        if self.co2In >  (self.max_co2 -100):
+            open_co2 = 1
+        elif self.co2In < (self.min_co2 +100):
+            open_co2 = 0
+
+
 
 
     client = mqtt.Client()
