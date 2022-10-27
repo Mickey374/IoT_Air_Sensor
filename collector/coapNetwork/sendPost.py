@@ -1,4 +1,3 @@
-from audioop import add
 from coapthon.server.coap import CoAP
 from coapthon.client.helperclient import HelperClient
 from coapthon.messages.request import Request
