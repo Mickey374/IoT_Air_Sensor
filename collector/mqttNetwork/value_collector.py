@@ -27,8 +27,8 @@ class MqttClientProfile:
             carbon_monoxide = data["carbon_monoxide"]
             humidity = data["humidity"]
             self.tempIn = temperature
-            self.carbonIn = carbon_monoxide
-            self.humidityIn = humidity
+            self.co2In = carbon_monoxide
+            self.humIn = humidity
             curr_date = datetime.now()
             cursor = self.connection.cursor()
             query = "INSERT INTO `node_data` (`node_id`, `timestamp`, `temperature`, `humidity`,  `carbon_monoxide`) VALUES (%s, %s, %s, %s, %s)"
@@ -258,7 +258,7 @@ class MqttClientProfile:
         if type == "check":
             self.client.loop_forever()
 
-            
+
     # client = mqtt.Client()
     # client.on_connect = on_connect
     # client.on_message = on_message
