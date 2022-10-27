@@ -207,6 +207,18 @@ class MqttClientProfile:
         elif self.co2In < (self.min_co2 +100):
             open_co2 = 0
 
+        #Initiate the trigger for the actuator
+        if open_temp ==1 and open_co2 ==1:
+            self.openFilters()
+        
+        elif open_temp ==1 and open_co2 == 0:
+            self.openFilters()
+        
+        elif open_temp == 0  and open_co2 == 1:
+            self.openFilters()
+        
+        elif open_temp == 0 and open_co2 == 0:
+            self.closeFilters()
 
 
 
