@@ -24,5 +24,11 @@ class ObserveSensor:
     
 
     def startObserving(self):
+        self.client = HelperClient(self.address)
+        self.mqtt = MqttClientProfile()
+        self.mqtt.mqtt_client(None, None, None, None, None, None, "communicate")
+        self.client.observe(self.resource, self.observer)
+    
+    def observer():
         
 
