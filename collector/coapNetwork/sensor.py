@@ -7,7 +7,7 @@ from coapthon.messages.request import Request
 from coapthon.messages.response import Response
 from coapthon.resources.resource import Resource
 from coapthon.utils import parse_uri
-from mqttNetwork.mqtt_collector_values import MqttClientData
+from mqttNetwork.value_collector import MqttClientData
 from database.db import Database
 from globalStatus import globalStatus
 

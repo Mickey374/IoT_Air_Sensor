@@ -1,13 +1,13 @@
-from datetime import datetime
-from http import client
-from coapNetwork.addresses import Addresses
+import imp
 import json
 import paho.mqtt.client as mqtt
+from datetime import datetime
 from database.db import Database
+from coapNetwork.addresses import Addresses
 from coapNetwork.sendPost import Post
 from globalStatus import globalStatus
 
-class MqttClientProfile:
+class MqttClientData:
     # The callback for when the client receives a CONNACK response from the server.
     def on_connect(self, client, userdata, flags, rc):
         # print("Connected with result code "+str(rc))
@@ -256,16 +256,3 @@ class MqttClientProfile:
         
         if type == "check":
             self.client.loop_forever()
-
-
-    # client = mqtt.Client()
-    # client.on_connect = on_connect
-    # client.on_message = on_message
-
-    # client.connect("mqtt.eclipseprojects.io", 1883, 60)
-
-    # Blocking call that processes network traffic, dispatches callbacks and
-    # handles reconnecting.
-    # Other loop*() functions are available that give a threaded interface and a
-    # manual interface.
-    # client.loop_forever()
