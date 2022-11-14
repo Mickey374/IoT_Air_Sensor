@@ -7,7 +7,7 @@ from coapthon.messages.request import Request
 from coapthon.messages.response import Response
 from coapthon.resources.resource import Resource
 from coapthon.utils import parse_uri
-from mqttNetwork.value_collector import MqttClientProfile
+from mqttNetwork.mqtt_collector_values import MqttClientData
 from database.db import Database
 from globalStatus import globalStatus
 
@@ -25,7 +25,7 @@ class ObserveSensor:
 
     def startObserving(self):
         self.client = HelperClient(self.address)
-        self.mqtt = MqttClientProfile()
+        self.mqtt = MqttClientData()
         self.mqtt.mqtt_client(None, None, None, None, None, None, "communicate")
         self.client.observe(self.resource, self.observer)
     
