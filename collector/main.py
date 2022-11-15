@@ -160,3 +160,19 @@ def start_configuration():
             print("\n>>Please follow instructions. Press [y | n]")
             ans = input(">>")
             ans = ans.strip().lower()
+
+
+
+if __name__ == "__main__":
+    conf = {"tempMax": 35,"tempMin":20,"humMax":80,"humMin":30,"co2Max": 1800,"co2Min":1200}
+    config_params = input("Welcome to Home Air Sensor simulator...\nDo you want to configure your parameters? [y|n]").strip().lower()
+    if(config_params == "yes" or config_params == "y"):
+        conf = start_configuration()
+    
+    print("\n>>Starting...")
+    allCommands()
+
+    print("\nSystem Initializing...\n")
+    time.sleep(2)
+
+    
