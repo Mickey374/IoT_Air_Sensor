@@ -93,10 +93,24 @@ def checkUserCommand(command, client, client1):
         except KeyboardInterrupt:
             return
     
-    
+    elif command == "change param":
+        globalStatus.changeVal = 1
+        conf = start_configuration()
+
+        client.tempMax = conf["tempMax"]
+        client.tempMin = conf["tempMin"]
+        client.humMax = conf["humMax"]
+        client.humMin = conf["humMin"]
+        client.co2Max = conf["co2Max"]
+        client.co2Min = conf["co2Min"]
+        globalStatus.changeVal = 0
 
 
 
 
 def showInfo():
+    return 1
+
+
+def start_configuration():
     return 1
