@@ -115,7 +115,13 @@ def checkUserCommand(command, client, client1):
 
 
 def showInfo():
-    return 1
+        print("\n"\
+            ">>logs: Displays messages that the sensors delivers to the app \n"\
+            ">>change params: Alters the current values of the threshold\n"\
+            ">>filter: Check current state of Filters\n"\
+            ">>simulate: Simulate the house sensor\n"\
+            ">>activate: Starts all the sensors in the Network\n"
+            ">>help: Displays commands that can be entered.\n")
 
 
 def start_configuration():
