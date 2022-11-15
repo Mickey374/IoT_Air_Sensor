@@ -109,7 +109,9 @@ def checkUserCommand(command, client, client1):
         print("\n>>Shutting Down")
         os._exit(0)
 
-
+    else:
+        print("/n>>Retry Commands Again...")
+        allCommands()
 
 
 def showInfo():
