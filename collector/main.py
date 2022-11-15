@@ -123,6 +123,23 @@ def showInfo():
             ">>activate: Starts all the sensors in the Network\n"
             ">>help: Displays commands that can be entered.\n")
 
+def validateField(field, defaultVal):
+    if(field.isnumeric()):
+        return int(field)
+    return defaultVal
 
 def start_configuration():
-    return 1
+    print("\n>>Define Thresholds for Params [Temperature | Humidity | Carbon Monoxide\n")
+    tempMax = validateField(input("MAX THRESHHOLD TEMPERATURE (default: 35°C) : "), 35)
+    tempMin = validateField(input("MIN THRESHHOLD TEMPERATURE (default: 20°C) : "), 20)
+    humMax = validateField(input("MAX THRESHHOLD HUMIDITY (default: 80%rh) : "), 80)
+    humMin = validateField(input("MIN THRESHHOLD HUMIDITY (default: 30%rh) : "), 30)
+    co2Max = validateField(input("MAX THRESHHOLD CO2 (default: 2000ppm) : "), 2000)
+    co2Min = validateField(input("MIN THRESHHOLD CO2 (default: 1000ppm) : "), 1000)
+    
+    print("\n>>Values for Thresholds: \n Max Temperature={}, \n Min Temperature={}, \n Max Humidity={}, \n Min Humidity={}, \n Max CO2={}, \n Min CO2={}"
+    .format(str(tempMax), str(tempMin), str(humMax), str(humMin), str(co2Max), str(co2Min)))
+    print("\n>>Do you wish to continue with the values [y/n]")
+
+    ans = input(">>")
+    ans = ans.lower()
