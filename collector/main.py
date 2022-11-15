@@ -104,6 +104,10 @@ def checkUserCommand(command, client, client1):
         client.co2Max = conf["co2Max"]
         client.co2Min = conf["co2Min"]
         globalStatus.changeVal = 0
+    
+    elif command == "exit":
+        print("\n>>Shutting Down")
+        os._exit(0)
 
 
 
