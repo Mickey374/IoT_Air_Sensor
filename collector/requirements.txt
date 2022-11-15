@@ -1,3 +1,4 @@
 coapthon == 4.0.2
 pymysql == 1.0.2
 paho-mqtt == 1.6.1
+pixelart == 7.0.0
