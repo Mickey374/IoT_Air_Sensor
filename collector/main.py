@@ -23,3 +23,14 @@ class CoAPServer(CoAP):
     def __init__(self, host, port):
         CoAP.__init__(self, (host, port), False)
         self.add_resource("registry", ResExample())
+    
+    def allCommands():
+        print(">> ALL COMMANDS TO START \n")
+        print(
+        "Help \n"\
+        "Activate\n"\
+        "Logs\n"\
+        "Simulate\n"\
+        "Change Params\n"
+        "Exit\n\n")
+    
