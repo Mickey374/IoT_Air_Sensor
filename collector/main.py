@@ -139,7 +139,24 @@ def start_configuration():
     
     print("\n>>Values for Thresholds: \n Max Temperature={}, \n Min Temperature={}, \n Max Humidity={}, \n Min Humidity={}, \n Max CO2={}, \n Min CO2={}"
     .format(str(tempMax), str(tempMin), str(humMax), str(humMin), str(co2Max), str(co2Min)))
-    print("\n>>Do you wish to continue with the values [y/n]")
+    print("\n>>Do you wish to continue with the values [y|n]")
 
     ans = input(">>")
-    ans = ans.lower()
+    ans = ans.strip().lower()
+
+    while 1:
+        if(ans == "y" or ans == "yes"):
+            return {
+                "tempMax": tempMax,
+                "tempMin": tempMin,
+                "humMax": humMax,
+                "humMin": humMin,
+                "co2Max": co2Max,
+                "co2Min": co2Min
+            }
+        elif(ans == "n" or ans == "no"):
+            start_configuration()
+        else:
+            print("\n>>Please follow instructions. Press [y | n]")
+            ans = input(">>")
+            ans = ans.strip().lower()
