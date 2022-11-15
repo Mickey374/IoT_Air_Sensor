@@ -34,3 +34,11 @@ class CoAPServer(CoAP):
         "Change Params\n"
         "Exit\n\n")
     
+    def getValuesFromClient(client, client1):
+        level = client1.levIn if client1.levIn else 50
+        humidity = client.humIn if client.humIn else 60
+        temperature = client.tempIn if client.tempIn else 27
+        co2 = client.co2In if client.co2In else 1300
+        tempOut = client.tempOut if client.tempOut else 30
+
+        return [level, humidity, temperature, co2, tempOut]
