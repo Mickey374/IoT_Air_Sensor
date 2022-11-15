@@ -20,4 +20,6 @@ ip = "::"
 port = 5683
 
 class CoAPServer(CoAP):
-    
+    def __init__(self, host, port):
+        CoAP.__init__(self, (host, port), False)
+        self.add_resource("registry", ResExample())
