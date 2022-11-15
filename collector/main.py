@@ -27,12 +27,12 @@ class CoAPServer(CoAP):
     def allCommands():
         print(">> ALL COMMANDS TO START \n")
         print(
-        "Help \n"\
-        "Activate\n"\
-        "Logs\n"\
-        "Simulate\n"\
-        "Change Params\n"
-        "Exit\n\n")
+        "help \n"\
+        "activate\n"\
+        "logs\n"\
+        "simulate\n"\
+        "change params\n"
+        "exit\n\n")
     
     def getValuesFromClient(client, client1):
         level = client1.levIn if client1.levIn else 50
@@ -42,3 +42,38 @@ class CoAPServer(CoAP):
         tempOut = client.tempOut if client.tempOut else 30
 
         return [level, humidity, temperature, co2, tempOut]
+
+    def checkUserCommand(command, client, client1):
+        if command == "help":
+            showInfo()
+        
+        elif command == "log":
+            try:
+                msg = str(client.message)
+                print("\n>>Press Ctrl+C to terminate session \n")
+                while True:
+                    time.sleep(1)
+                    if(str(client.message) != msg):
+                        print("\n>>"+str(client.message)+ str(client1.message))
+                        msg = str(client.message)
+            except KeyboardInterrupt:
+                return
+
+        elif command == "filter":
+            try:
+                msg = str(client.message)
+                print("\n>>Press Ctrl+C to terminate session \n")
+                while True:
+                    time.sleep(1)
+                    if(str(client1.message) != msg):
+                        print("\n>>"+str(client1.message))
+                        msg = str(client1.message)
+            except KeyboardInterrupt:
+                return   
+        
+        
+
+
+
+
+    
