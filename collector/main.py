@@ -175,4 +175,16 @@ if __name__ == "__main__":
     print("\nSystem Initializing...\n")
     time.sleep(2)
 
-    
+    #Initialize the Thread for Client
+    client = MqttClientData()
+    thread = threading.Thread(
+        target=client.mqtt_client,
+        args=(
+            conf["tempMax"], conf["tempMin"],
+            conf["humMax"], conf["humMin"],
+            conf["co2Max"], conf["co2Min"]),
+        kwargs={})
+    thread.start()
+
+    #Initialize for the Client 1
+    #Create the Method for the Out Sensor
