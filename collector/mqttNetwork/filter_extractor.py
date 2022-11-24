@@ -27,3 +27,17 @@ class MqttClientExtractionFilter:
         query = "INSERT INTO `gas_extractor` (`node_id`, `timestamp`, `mode`) VALUES (%s, %s, %s)"
         cursor.execute(query, (str(node_id), dt, mode))
         self.connection.commit()
+
+    #This will be the callback for when a publish message is received from server
+    def on_message(self, client, userdata, msg):
+        #check the type of message received
+        if(msg.topic == "status_gasExtractor"):
+            self.message = msg.payload
+            data = json.loads(msg.payload)
+            node_id = data["node"]
+            level = data["level"]
+            self.levIn = level
+            self.update_gas_monitoring_mode(node_id, level)
+            self.checkActuatorMode(level)
+        else:
+            return
