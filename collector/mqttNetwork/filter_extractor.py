@@ -10,4 +10,5 @@ from globalStatus import globalStatus
 
 class MqttClientExtractionFilter:
     def on_connect(self, client, userdata, flags, rc):
-        
+        self.client.subscribe("status_gasExtractor")
+        self.client.subscribe("actuator__gasExtractor")
