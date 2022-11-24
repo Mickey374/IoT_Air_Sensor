@@ -21,3 +21,9 @@ class MqttClientExtractionFilter:
         print("\nSTATUS = "+ status)
         self.connection.commit()
     
+    def update_gas_monitoring_mode(self, node_id, mode):
+        dt = datetime.now()
+        cursor = self.connection.cursor()
+        query = "INSERT INTO `gas_extractor` (`node_id`, `timestamp`, `mode`) VALUES (%s, %s, %s)"
+        cursor.execute(query, (str(node_id), dt, mode))
+        self.connection.commit()
