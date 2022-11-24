@@ -41,3 +41,21 @@ class MqttClientExtractionFilter:
             self.checkActuatorMode(level)
         else:
             return
+    
+    ##Method to on/off the charge valve for the extractor
+    def closeCharge(self):
+        for ad in Addresses.ad_Filters:
+            status = self.executeLastState(ad, "filtering", "status")
+            manual = self.executeLastState(ad, "filtering", "manual")
+            if manual =="1" and status!= "0":
+                return
+            if status=="2":
+                status = "0"
+                sleep(1)
+                success = Post.getStatusFilters(ad, status)
+                if success == 1:
+                    self.update_gas_monitoring_status(str(ad), "0")
+                    if globalStatus.changeVal == 0: print("\nCHARGE DISPENSER CLOSED\n")
+                    self.connection.commit()
+            else:
+                return
