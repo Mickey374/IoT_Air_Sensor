@@ -191,3 +191,8 @@ if __name__ == "__main__":
     client1 = MqttClientExtractionFilter()
     thread1 = threading.Thread(target=client1.mqtt_client, args=(), kwargs={})
     thread1.start()
+
+    #Initialize for the Server
+    server = CoAPServer(ip, port)
+    thread2 = threading.Thread(target=server.listen(), args=(), kwargs={})
+    thread2.start()
