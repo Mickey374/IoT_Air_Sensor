@@ -4,10 +4,11 @@ import threading
 import time
 import os
 import pixelart as pa
+import paho.mqtt.client as mqtt
 from coapNetwork.addresses import Addresses
 from coapNetwork.sensor import ObserveSensor
 from mqttNetwork.value_collector import MqttClientData
-import paho.mqtt.client as mqtt
+from mqttNetwork.filter_extractor import MqttClientExtractionFilter
 from coapthon.server.coap import CoAP
 from coapthon.resources.resource import Resource
 from coapthon.messages.request import Request
@@ -37,7 +38,7 @@ def allCommands():
 
 def getValuesFromClient(client, client1):
     level = client1.levIn if client1.levIn else 50
-    humidity = client.humIn if client.humIn else 60
+    humidity = client.humIn if client.humIn else 50
     temperature = client.tempIn if client.tempIn else 27
     co2 = client.co2In if client.co2In else 1300
     tempOut = client.tempOut if client.tempOut else 30
@@ -139,7 +140,7 @@ def start_configuration():
     
     print("\n>>Values for Thresholds: \n Max Temperature={}, \n Min Temperature={}, \n Max Humidity={}, \n Min Humidity={}, \n Max CO2={}, \n Min CO2={}"
     .format(str(tempMax), str(tempMin), str(humMax), str(humMin), str(co2Max), str(co2Min)))
-    print("\n>>Do you wish to continue with the values [y|n]")
+    print("\n>>Do you wish to continue with these values? [y|n]")
 
     ans = input(">>")
     ans = ans.strip().lower()
@@ -182,9 +183,11 @@ if __name__ == "__main__":
         args=(
             conf["tempMax"], conf["tempMin"],
             conf["humMax"], conf["humMin"],
-            conf["co2Max"], conf["co2Min"]),
+            conf["co2Max"], conf["co2Min"], "check"),
         kwargs={})
     thread.start()
 
     #Initialize for the Client 1
-    #Create the Method for the Out Sensor
+    client1 = MqttClientExtractionFilter()
+    thread1 = threading.Thread(target=client1.mqtt_client, args=(), kwargs={})
+    thread1.start()
