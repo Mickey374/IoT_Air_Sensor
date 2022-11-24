@@ -104,8 +104,26 @@ class MqttClientExtractionFilter:
         else:
             return
     
+    #Function to notify status change for actuators
     def communicateToSensors(self, status):
         if status == "2":
             self.client.publish("actuator_gasExtractor", "charge")
         elif status == "0":
             self.client.publish("actuator_gasExtractor", "full")
+    
+    def mqtt_client(self):
+        self.db = Database()
+        self.connection = self.db.connect()
+        self.message = ""
+        self.level = 80
+        self.levIn = None
+        print("\n⛽⛽MQTT Client Gas Extraction starting...⛽⛽\n")
+        self.client = mqtt.Client()
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
+        try:
+            self.client.connect("127.0.0.1", 1883, 60)
+        except Exception as e:
+            print(str(e))
+            
+        self.client.loop_forever()
