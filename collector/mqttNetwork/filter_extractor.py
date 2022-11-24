@@ -82,3 +82,16 @@ class MqttClientExtractionFilter:
                     self.update_gas_monitoring_status(str(ad), status)
                     if globalStatus.changeVal == 0: print("\n🔛🔛CHARGE DISPENSER CLOSED🔛🔛\n")
                     self.communicateToSensors("2")
+    
+
+    #Function to retrieve last state and address of actuator
+    def executeLastState(self, address, table, column):
+        cursor = self.connection.cursor()
+        query = "SELECT * FROM actuator_"+table+" WHERE address=%s ORDER BY timestamp DESC LIMIT 1"
+        cursor.execute(query, str(address))
+        result_vals = cursor.fetchall()
+        if not result_vals:
+            return None
+        else:
+            for resp in result_vals:
+                return resp[column]
