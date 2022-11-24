@@ -95,3 +95,11 @@ class MqttClientExtractionFilter:
         else:
             for resp in result_vals:
                 return resp[column]
+    
+    def checkExtractorMode(self, level):
+        if level < 20:
+            self.onCharge()
+        elif level > 80:
+            self.offCharge()
+        else:
+            return
