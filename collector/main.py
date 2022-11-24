@@ -196,3 +196,18 @@ if __name__ == "__main__":
     server = CoAPServer(ip, port)
     thread2 = threading.Thread(target=server.listen(), args=(), kwargs={})
     thread2.start()
+
+    time.sleep(15)
+    start = 0
+
+    try:
+        while 1:
+            if ResExample.filters == 1 and ResExample.fans == 1:
+                if start == 0:
+                    print("\n⚙️⚙️Air Sensor System running..⚙️⚙️\n")
+                    print("\nInitialize sensor node using 'activate'\n\n")
+                    start = 1
+                command = input("COMMAND>>")
+                command = command.strip().lower()
+    except Exception as e:
+        print(str(e))
