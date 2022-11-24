@@ -209,5 +209,12 @@ if __name__ == "__main__":
                     start = 1
                 command = input("COMMAND>>")
                 command = command.strip().lower()
-    except Exception as e:
-        print(str(e))
+
+                checkUserCommand(command, client, client1)
+            
+            else:
+                print("\n⌛️ ⌛️ Controller is waiting for sensors⌛️ ⌛️ \n")
+                time.sleep(5)
+    except KeyboardInterrupt:
+        print("\n🔐🔐SYSTEM CLOSING🔐🔐\n")
+        os._exit(0)
