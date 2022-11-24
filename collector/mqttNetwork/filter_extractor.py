@@ -3,7 +3,7 @@ import json
 from time import sleep
 from datetime import datetime
 from database.db import Database
-from pydoc import cli
+# from pydoc import cli
 from coapNetwork.addresses import Addresses
 from coapNetwork.sendPost import Post
 from globalStatus import globalStatus
@@ -125,5 +125,5 @@ class MqttClientExtractionFilter:
             self.client.connect("127.0.0.1", 1883, 60)
         except Exception as e:
             print(str(e))
-            
+
         self.client.loop_forever()
