@@ -103,3 +103,9 @@ class MqttClientExtractionFilter:
             self.offCharge()
         else:
             return
+    
+    def communicateToSensors(self, status):
+        if status == "2":
+            self.client.publish("actuator_gasExtractor", "charge")
+        elif status == "0":
+            self.client.publish("actuator_gasExtractor", "full")
