@@ -43,7 +43,7 @@ class MqttClientExtractionFilter:
             return
     
     ##Method to on/off the charge valve for the extractor
-    def closeCharge(self):
+    def offCharge(self):
         for ad in Addresses.ad_Filters:
             status = self.executeLastState(ad, "filtering", "status")
             manual = self.executeLastState(ad, "filtering", "manual")
@@ -55,7 +55,30 @@ class MqttClientExtractionFilter:
                 success = Post.getStatusFilters(ad, status)
                 if success == 1:
                     self.update_gas_monitoring_status(str(ad), "0")
-                    if globalStatus.changeVal == 0: print("\nCHARGE DISPENSER CLOSED\n")
+                    if globalStatus.changeVal == 0: print("\n📴📴CHARGE DISPENSER CLOSED📴📴\n")
                     self.connection.commit()
             else:
                 return
+    
+    def onCharge(self):
+        for ad in Addresses.ad_Filters:
+            status = self.executeLastState(ad, "filtering", "status")
+            manual = self.executeLastState(ad, "filtering", "manual")
+            if manual =="1" and status!= "0":
+                return
+            if status=="0":
+                status = "2"
+                sleep(1)
+                success = Post.getStatusFilters(ad, status)
+                if success == 1:
+                    self.update_gas_monitoring_status(str(ad), status)
+                    if globalStatus.changeVal == 0: print("\n🔛🔛CHARGE DISPENSER CLOSED🔛🔛\n")
+                    self.communicateToSensors("2")
+            
+            if status is None:
+                status = "2"
+                success = Post.getStatusFilters(ad, status)
+                if success == 1:
+                    self.update_gas_monitoring_status(str(ad), status)
+                    if globalStatus.changeVal == 0: print("\n🔛🔛CHARGE DISPENSER CLOSED🔛🔛\n")
+                    self.communicateToSensors("2")
