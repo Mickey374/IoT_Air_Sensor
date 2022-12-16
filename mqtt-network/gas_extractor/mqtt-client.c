@@ -73,8 +73,8 @@ static const char *broker_ip = MQTT_CLIENT_BROKER_IP_ADDR;
 /* Various states */
 static uint8_t state;
 
-#define STATE_INIT    		  0
-#define STATE_NET_OK    	  1
+#define STATE_INIT    		    0
+#define STATE_NET_OK    	    1
 #define STATE_CONNECTING      2
 #define STATE_CONNECTED       3
 #define STATE_SUBSCRIBED      4
@@ -86,7 +86,7 @@ AUTOSTART_PROCESSES(&mqtt_client_process);
 
 /*---------------------------------------------------------------------------*/
 /* Maximum TCP segment size for outgoing segments of our socket */
-#define MAX_TCP_SEGMENT_SIZE    32
+#define MAX_TCP_SEGMENT_SIZE     32
 #define CONFIG_IP_ADDR_STR_LEN   64
 /*---------------------------------------------------------------------------*/
 /*

@@ -16,7 +16,7 @@ class Post:
         return client
     
     def getStatusFilters(ad, status):
-        res = Post.getClients(ad).post("filters", "mode="+status)
+        res = Post.getClients(ad).post("extractors", "mode="+status)
 
         if res.code == 67:
             return 1

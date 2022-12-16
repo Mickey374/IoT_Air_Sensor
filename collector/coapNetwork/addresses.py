@@ -3,7 +3,7 @@ class Addresses:
     ad_Fans = []
 
     def insertNewAddress(source, val):
-        if val == "filters":
+        if val == "extractors":
             Addresses.ad_Filters.append(source)
         elif val == "fans":
             Addresses.ad_Fans.append(source)

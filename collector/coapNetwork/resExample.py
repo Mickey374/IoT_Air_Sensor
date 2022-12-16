@@ -11,7 +11,7 @@ class ResExample(Resource):
         self.payload = "Advanced resource"
     
     def render_GET(self, request):
-        if request.payload == "filters":
+        if request.payload == "extractors":
             Addresses.insertNewAddress(request.source, "valves")
             ResExample.valves = 1
             ob = ObserveSensor(request.source, "obs", 0)

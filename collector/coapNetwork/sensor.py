@@ -43,17 +43,17 @@ class ObserveSensor:
         if self.type == 0:
             status = data["status"]
             dt = datetime.now()
-            self.executeQuery(self.address, status, dt, "filtering")
+            self.executeQuery(self.address, status, dt, "extracting")
 
             if str(status) == "1":
-                if globalStatus.changeVal == 0: print("\n ☢️☢️ STARTING FILTERING PROCESS. ☢️☢️")
+                if globalStatus.changeVal == 0: print("\n ☢️☢️ STARTING EXTRACTION PROCESS. ☢️☢️")
                 globalStatus.setFilterStatus(1)
-                self.mqtt.communicateToSensors(status, "filter")
+                self.mqtt.communicateToSensors(status, "extract")
 
             elif str(status) == "0":
                 if globalStatus.changeVal == 0: print("\n DEFAULT STATE:: WAITING")
                 globalStatus.changeVal(0)
-                self.mqtt.communicateToSensors(status, "filter")
+                self.mqtt.communicateToSensors(status, "extract")
             
 
         #If the type is 1
