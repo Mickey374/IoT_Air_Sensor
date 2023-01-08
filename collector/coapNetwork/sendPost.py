@@ -16,15 +16,15 @@ class Post:
         return client
     
     def getStatusFilters(ad, status):
-        res = Post.getClients(ad).post("extractors", "mode="+status)
+        res = Post.getClients(ad).post("obs", "mode="+status)
 
         if res.code == 67:
             return 1
         else:
             return 0
     
-    def getStatusFan(ad, status):
-        res = Post.getClients(ad).post("cooling", "mode="+status)
+    def getStatusWindows(ad, status):
+        res = Post.getClients(ad).post("window", "mode="+status)
 
         if res.code == 67:
             return 1

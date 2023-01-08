@@ -11,14 +11,15 @@ class MqttClientData:
     # The callback for when the client receives a CONNACK response from the server.
     def on_connect(self, client, userdata, flags, rc):
         # print("Connected with result code "+str(rc))
-        self.client.subscribe("temp_status_in")     #for temperature, humidity, carbon monoxide
-        self.client.subscribe("temp_status_out")    #for temperature outside
-        self.client.subscribe("actuator_out")       #initiate filter for external temperature sensor
-        self.client.subscribe("actuator_in")        #initiate filter & fan for internal temperature sensor
+        self.client.subscribe("status_data")     #for temperature, humidity, carbon monoxide
+        self.client.subscribe("status_outside")    #for temperature outside
+        self.client.subscribe("actuator_outside")       #initiate window for external temperature sensor
+        self.client.subscribe("actuator_outside")        #initiate window for internal temperature sensor
+        self.client.subscribe("actuator_gasExtractor")   #for gas fan extractor
 
     # The callback for when a PUBLISH message is received from the server.
     def on_message(self, client, userdata, msg):
-        if msg.topic == "temp_status_in":
+        if msg.topic == "status_data":
             self.message = msg.payload
             data = json.loads(msg.payload)
             node_ID = data["node"]
@@ -35,13 +36,13 @@ class MqttClientData:
             self.connection.commit()
             self.checkActuatorFan(temperature, humidity, carbon_monoxide)
         
-        elif msg.topic == "temp_status_out":
+        elif msg.topic == "status_outside":
             self.message1 = msg.payload
             data = json.loads(msg.payload)
             node_ID = data["node"]
             tempOut = data["tempOut"]
             self.tempOut = tempOut
-            self.checkActuatorFilter(tempOut)
+            self.checkActuatorWindow(tempOut)
     
     #Function to get most recent state of each actuator
     def executeCurrentState(self, address, table, col):
@@ -57,7 +58,7 @@ class MqttClientData:
 
     #Function to communicate to the Sensors to Initiate  Action based on change
     def communicateToSensors(self, status, type):
-        if type == "filter":
+        if type == "window":
             if str(status) == "1":
                 globalStatus.setFilterStatus(1)
                 self.client.publish("actuator_data", "Open")
@@ -73,58 +74,58 @@ class MqttClientData:
                 self.client.publish("actuator_data", "stopFan")            
 
     # ======= Function declaration to open and close the Filters ==========
-    def openFilters(self):
-        for curr_add in Addresses.ad_Filters:
-            open = self.executeCurrentState(curr_add, "filter", "status")
-            manual =self.executeCurrentState(curr_add, "filter", "manual")
+    def openWindows(self):
+        for curr_add in Addresses.ad_Windows:
+            open = self.executeCurrentState(curr_add, "window", "status")
+            manual =self.executeCurrentState(curr_add, "window", "manual")
 
             if manual=='1' and open != '0':
                 return
             if open is not None:
                 if open =="0":
                     open = "1"
-                    success = Post.getStatusFilters(curr_add, open)
+                    success = Post.getStatusWindows(curr_add, open)
                     if success == 1:
                         dt = datetime.now()
                         cursor = self.connection.cursor()
-                        query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
+                        query = "INSERT INTO `actuator_window` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
                         cursor.execute(query, (str(curr_add), dt, open))
                         if globalStatus.changeVal == 0:
-                            print("\n ☢️☢️☢️ OPENING FILTERS ☢️☢️☢️\n")
+                            print("\n ☢️☢️☢️ OPENING WINDOWS ☢️☢️☢️\n")
                         self.connection.commit()
-                        self.communicateToSensors("1", "filter")
+                        self.communicateToSensors("1", "window")
             
             elif open is None:
                 open = "1"
-                success = Post.getStatusFilters(curr_add, open)
+                success = Post.getStatusWindows(curr_add, open)
                 if success == 1:
                     dt = datetime.now()
                     cursor = self.connection.cursor()
-                    query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
+                    query = "INSERT INTO `actuator_window` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
                     cursor.execute(query, (str(curr_add), dt, open))
                     if globalStatus.changeVal == 0:
-                        print("\n ☢️☢️☢️ OPENING FILTERS... ☢️☢️☢️\n")
+                        print("\n ☢️☢️☢️ OPENING WINDOWS... ☢️☢️☢️\n")
                     self.connection.commit()
-                    self.communicateToSensors("1", "filter")
+                    self.communicateToSensors("1", "window")
     
-    def closeFilters(self):
-        for curr_add in Addresses.ad_Filters:
-            open = self.executeCurrentState(curr_add, "filter", "Status")
-            manual = self.executeCurrentState(curr_add, "filter", "manual")
+    def closeWindows(self):
+        for curr_add in Addresses.ad_Windows:
+            open = self.executeCurrentState(curr_add, "window", "status")
+            manual = self.executeCurrentState(curr_add, "window", "manual")
             if manual == "1" and open != "0":
                 return
             if open == "1":
                 open = "0"
-                success = Post.getStatusFilters(curr_add, open)
+                success = Post.getStatusWindows(curr_add, open)
                 if success == 1:
                         dt = datetime.now()
                         cursor = self.connection.cursor()
-                        query = "INSERT INTO `actuator_filter` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
+                        query = "INSERT INTO `actuator_window` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
                         cursor.execute(query, (str(curr_add), dt, open))
                         if globalStatus.changeVal == 0:
-                            print("\n 🚫🚫🚫 CLOSING FILTERS... 🚫🚫🚫\n")
+                            print("\n 🚫🚫🚫 CLOSING WINDOWS... 🚫🚫🚫\n")
                         self.connection.commit()
-                        self.communicateToSensors("0", "filter")
+                        self.communicateToSensors("0", "window")
 
     # ======== Function to start fan within the environment =============
     def startFan(self):
@@ -144,7 +145,7 @@ class MqttClientData:
                     if globalStatus.changeVal == 0:
                         print("\n ☢🌀😌 STARTING FAN... ☢🌀😌\n")
                     self.connection.commit()
-                    self.communicateToSensors(status, "initFan")
+                    self.communicateToSensors(status, "inValues")
             
             if status == "0":
                 status = "1"
@@ -157,7 +158,7 @@ class MqttClientData:
                     if globalStatus.changeVal == 0:
                         print("\n ☢💨😌 STARTING FAN... ☢💨😌\n")
                     self.connection.commit()
-                    self.communicateToSensors(status, "initFan")
+                    self.communicateToSensors(status, "inValues")
 
     def stopFan(self):
         for curr_add in Addresses.ad_Fans:
@@ -176,7 +177,7 @@ class MqttClientData:
                     if globalStatus.changeVal == 0:
                         print("\n ☢🔌⏹️ STOPPING FAN... ☢🔌⏹️\n")
                     self.connection.commit()
-                    self.communicateToSensors(status, "initFan")
+                    self.communicateToSensors(status, "inValues")
 
     # ======== Checking if Actuators should be started =========
     def shouldStartFan(self, temp, hum, max_temp, max_hum, min_hum):
@@ -190,7 +191,7 @@ class MqttClientData:
         else:
             self.stopFan()
     
-    def checkActuatorFilters(self, tempOut):
+    def checkActuatorWindows(self, tempOut):
         open_temp = 0
         open_co2 = 0
 
@@ -209,16 +210,16 @@ class MqttClientData:
 
         #Initiate the trigger for the actuator
         if open_temp ==1 and open_co2 ==1:
-            self.openFilters()
+            self.openWindows()
         
         elif open_temp ==1 and open_co2 == 0:
-            self.openFilters()
+            self.openWindows()
         
         elif open_temp == 0  and open_co2 == 1:
-            self.openFilters()
+            self.openWindows()
         
         elif open_temp == 0 and open_co2 == 0:
-            self.closeFilters()
+            self.closeWindows()
 
 
     client = None

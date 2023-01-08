@@ -1,12 +1,12 @@
 class Addresses:
-    ad_Filters = []
+    ad_Windows = []
     ad_Fans = []
 
     def insertNewAddress(source, val):
-        if val == "extractors":
-            Addresses.ad_Filters.append(source)
-        elif val == "fans":
+        if val == "filters":
             Addresses.ad_Fans.append(source)
+        elif val == "windows":
+            Addresses.ad_Windows.append(source)
 
     
     def constructAddress():

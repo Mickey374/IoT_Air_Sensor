@@ -43,31 +43,36 @@ class ObserveSensor:
         if self.type == 0:
             status = data["status"]
             dt = datetime.now()
-            self.executeQuery(self.address, status, dt, "extracting")
+            self.executeQuery(self.address, status, dt, "filtering")
 
             if str(status) == "1":
-                if globalStatus.changeVal == 0: print("\n ☢️☢️ STARTING EXTRACTION PROCESS. ☢️☢️")
+                if globalStatus.changeVal == 0: print("\n ☢️☢️ STARTING FILTERING PROCESS. ☢️☢️")
                 globalStatus.setFilterStatus(1)
-                self.mqtt.communicateToSensors(status, "extract")
+                self.mqtt.communicateToSensors(status, "inValues")
 
             elif str(status) == "0":
                 if globalStatus.changeVal == 0: print("\n DEFAULT STATE:: WAITING")
-                globalStatus.changeVal(0)
-                self.mqtt.communicateToSensors(status, "extract")
+                globalStatus.setFilterStatus(0)
+                self.mqtt.communicateToSensors(status, "inValues")
+
+            elif str(status) == "2":
+                    if globalStatus.changeVal == 0: print("\n OPEN CHARGE TANK")
+                    globalStatus.setFilterStatus(2)
+                    self.mqtt.communicateToSensors(status, "inValues")
             
 
         #If the type is 1
         elif self.type == 1:
             status = data["open"]
             dt = datetime.now()
-            self.executeQuery(self.address, status, dt, "fan")
+            self.executeQuery(self.address, status, dt, "window")
 
             if str(status) == "1":
-                if globalStatus.changeVal == 0: print("\n ☢️☢️ STARTING FAN")
-                globalStatus.setFilterStatus(1)
-                self.mqtt.communicateToSensors(status, "fan")
+                if globalStatus.changeVal == 0: print("\n ☢️☢️ OPENING WINDOW")
+                globalStatus.setWindowStatus(1)
+                self.mqtt.communicateToSensors(status, "window")
 
             elif str(status) == "0":
                 if globalStatus.changeVal == 0: print("\n DEFAULT STATE:: WAITING")
-                globalStatus.changeVal(0)
-                self.mqtt.communicateToSensors(status, "fan")
+                globalStatus.setWindowStatus(0)
+                self.mqtt.communicateToSensors(status, "window")

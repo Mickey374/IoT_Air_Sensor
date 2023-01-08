@@ -16,7 +16,7 @@ class MqttClientExtractionFilter:
     def update_gas_monitoring_status(self, ad, status):
         dt = datetime.now()
         cursor = self.connection.cursor()
-        query = "INSERT INTO `actuator_filtering` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
+        query = "INSERT INTO `actuator_fan` (`address`, `timestamp`, `status`) VALUES (%s, %s, %s)"
         cursor.execute(query, (str(ad), dt, status))
         print("\nSTATUS = "+ status)
         self.connection.commit()
@@ -57,6 +57,7 @@ class MqttClientExtractionFilter:
                     self.update_gas_monitoring_status(str(ad), "0")
                     if globalStatus.changeVal == 0: print("\n📴📴CHARGE DISPENSER CLOSED📴📴\n")
                     self.connection.commit()
+                    self.communicateToSensors("0")
             else:
                 return
     
@@ -109,7 +110,7 @@ class MqttClientExtractionFilter:
         if status == "2":
             self.client.publish("actuator_gasExtractor", "charge")
         elif status == "0":
-            self.client.publish("actuator_gasExtractor", "full")
+            self.client.publish("actuator_gasExtractor", "stop")
     
     def mqtt_client(self):
         self.db = Database()
