@@ -6,7 +6,7 @@ class Database:
     def __init__(self):
         print("Initializing Database...")
 
-    def connect(self):
+    def connect_db(self):
         if self.connection is not None:
             return self.connection
         else:

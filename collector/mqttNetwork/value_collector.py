@@ -2,7 +2,7 @@ import imp
 import json
 import paho.mqtt.client as mqtt
 from datetime import datetime
-from database.db import Database
+from collector.database import Database
 from coapNetwork.addresses import Addresses
 from coapNetwork.sendPost import Post
 from globalStatus import globalStatus
