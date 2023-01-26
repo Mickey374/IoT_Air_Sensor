@@ -9,22 +9,42 @@ from coapthon.client.helperclient import HelperClient
 from coapthon.messages.request import Request
 from coapthon.messages.response import Response
 from coapthon import defines
-from mote_resource import MoteResource
+from alert_resource import AlertResource
+from poisonous_resource import PoisonResource
 
 class AdvancedResource(Resource):
     def __init__(self, name="Advanced"):
         super(AdvancedResource, self).__init__(name)
-        self.payload = "Advanced resource"
+        self.payload = "Advanced Resource"
     
     def render_GET_advanced(self, request, response):
-        if request.payload is None:
-            print("Empty Payload")
-            mr = MoteResource(request.source)
-            return self, None
-        else:
-            moteInfo = json.loads(request.payload)
-            response.payload = self.payload
-            response.max_age = 20
-            response.code = defines.Codes.CONTENT.number
-            moteResource = MoteResource(request.source)
-            return self, response
+        print("GET Server message: \n", request.payload)
+
+        moteInfo = json.loads(request.payload)
+        response.payload = self.payload
+
+        response.max_age = 20
+        response.code = defines.Codes.CONTENT.number
+
+        moteInfo["Source"] = request.source
+        motionResource = PoisonResource(moteInfo["Source"], moteInfo["Resource"])
+        return self, response
+    
+
+class AdvancedResourceAlert(Resource):
+    def __init__(self, name="AdvancedAlert"):
+        super(AdvancedResourceAlert, self).__init__(name)
+        self.payload = "Registration Successful"
+    
+    def render_GET_advanced(self, request, response):
+        print("GET Server message: \n", request.payload)
+
+        moteInfo = json.loads(request.payload)
+        response.payload = self.payload
+
+        response.max_age = 20
+        response.code = defines.Codes.CONTENT.number
+
+        moteInfo["Source"] = request.source
+        alertResource = AlertResource(moteInfo["Source"], moteInfo["Resource"])
+        return self, response
