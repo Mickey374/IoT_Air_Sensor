@@ -26,17 +26,17 @@ EVENT_RESOURCE(poison_sensor,
             NULL,
             NULL,
             NULL,
-            res_event_handler)
+            res_event_handler);
 
 static void res_get_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset){
     int length;
-    char msg[255];
+    char msg[300];
 
     if(isActive==true && intensity<=100){
-        intensity=intensity+5;
+        intensity=intensity+10;
     }
     else if(isActive==false){
-        intensity=15;
+        intensity=10;
     }
 
     if(isDetected==1){
@@ -64,7 +64,7 @@ static void res_get_handler(coap_message_t *request, coap_message_t *response, u
     length = strlen(msg);              // Store length of entire msg string in length variable 
 
     memcpy(buffer, (uint8_t *)msg, length);  // Copy contents of msg into buffer array as type uint8* (unsigned 8 bit integer) 
-    printf("MSG res motion send : %s\n", msg);// Print out contents of entire message for debugging purposes 
+    printf("MSG res poison_sensor send : %s\n", msg);// Print out contents of entire message for debugging purposes 
 
     coap_set_header_content_format(response, TEXT_PLAIN);
     coap_set_header_etag(response, (uint8_t *)&length, 1);

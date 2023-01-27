@@ -23,18 +23,18 @@ class PoisonResource:
         self.resource = resource
         self.actuator_resource = "alert_actuator"
         self.isDetected = "F"
-        self.intensity = 15
+        self.intensity = 10
         self.isActive = "F"
 
         #Start Observing the Resource from the Source address
         self.start_observing()
-        print("Poison Air Resource Observing Init...")
+        print("Poison Sensor Resource Observing Init...")
     
     def observer(self, response):
-        print("Callback Initiated Gas")
+        print("Callback called, Resource arrived")
         if response.payload is None:
             print("No Response Received")
-            return
+            # return
         else:
             print("Response", response.payload)
 
@@ -43,8 +43,10 @@ class PoisonResource:
             isDetected = node_data["isDetected"].split(" ")
             info = node_data["info"].split(" ")
             intensity = node_data["intensity"].split(" ")
-            print("Poisonous Gas value: \n")
-            print(isDetected, info, intensity)
+            print("Poisonous Gas node value: \n")
+            print(isDetected)
+            print(info)
+            print(intensity)
             self.isDetected = isDetected[0]
             self.intensity = intensity[0]
             self.isActive = info[0]
@@ -63,18 +65,17 @@ class PoisonResource:
     def execute_query_poisongas(self, state):
         with self.connection.cursor() as cursor:
             dt = datetime.now()
+            curr_dt = dt.strftime("%Y-%m-%d %H:%M:%S")
             intensity = str(self.intensity)
             extractor = str(self.isActive)
-            sql = "INSERT INTO `coapsensorgas` (`state`, `extractor`, `intensity`, datetime) VALUES (%s, %s, %s,%s)"
-            cursor.execute(sql, (state,extractor,intensity,dt))
+            sql = "INSERT INTO `coapsensorgas` (`state`, `extractor`, `intensity`, `datetime`) VALUES (%s, %s, %s,%s)"
+            cursor.execute(sql, (state,extractor,intensity,curr_dt))
         self.connection.commit()
-        self.show_log()
-        
-    def show_log(self):
-        with self.connection.cursor() as cursor:
+
+        with self.connection.cursor() as new_cursor:
             sql = "SELECT * FROM `coapsensorgas`"
-            cursor.execute(sql)
-            results = cursor.fetchall()
+            new_cursor.execute(sql)
+            results = new_cursor.fetchall()
             header = results[0].keys() if len(results) > 0 else []  
             rows = [x.values() for x in results]
             print(tabulate.tabulate(rows, header, tablefmt='grid'))

@@ -21,15 +21,15 @@ class AlertResource:
         self.actuator_resource = "alert_actuator"
         self.resource = resource
         self.address = source_address
-        self.intensity = 15
+        self.intensity = 10
         self.isActive = "F"
 
         #Start Observing the Resource from the Source address
         self.start_observing()
-        print("Resource Observing Init...")
+        print("Alert Resource Init...")
     
     def observer(self, response):
-        print("Callback Initiated")
+        print("Callback Initiated, Resource arrived")
         if response.payload is None:
             print("No Response Received")
         else:
@@ -39,34 +39,35 @@ class AlertResource:
             node_data = json.loads(response.payload)
             info = node_data["info"].split(" ")
             intensity = node_data["intensity"].split(" ")
-            print("Current extraction value: \n")
-            print(info, intensity)
+            print("Current extraction Speed value: \n")
+            print(info)
+            print(intensity)
 
             self.isDetected = info[0]
             self.intensity = intensity[0]
 
             #When the poisonous gas is detected, initiate a query
             if self.isDetected == "T":
-                print("Poisonous Gas detected")
+                print("Poisonous Gas detected...")
                 self.execute_query(1)
             else:
                 print("Air Safe")
                 self.execute_query(0)
 
     def execute_query(self, state):
+        print(self.connection)
         with self.connection.cursor() as cursor:
             dt = datetime.now()
+            curr_dt = dt.strftime("%Y-%m-%d %H:%M:%S")
             intensity = str(self.intensity)
-            sql = "INSERT INTO `coapsensorextractor` (`state`, `intensity`, datetime) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (state, intensity, dt))
+            sql = "INSERT INTO `coapsensorextractor` (`state`, `intensity`, `datetime`) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (state, intensity, curr_dt))
         self.connection.commit()
-        self.show_log()
         
-    def show_log(self):
-        with self.connection.cursor() as cursor:
+        with self.connection.cursor() as cursor_new:
             sql = "SELECT * FROM `coapsensorextractor`"
-            cursor.execute(sql)
-            results = cursor.fetchall()
+            cursor_new.execute(sql)
+            results = cursor_new.fetchall()
             header = results[0].keys() if len(results) > 0 else []  
             rows = [x.values() for x in results]
             print(tabulate.tabulate(rows, header, tablefmt='grid'))

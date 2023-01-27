@@ -74,7 +74,8 @@ PROCESS_THREAD(coap_client, ev, data)
     etimer_set(&register_timer, TOGGLE_INTERVAL * CLOCK_SECOND);
 
     while (1)
-    {
+    {   
+        printf("Connection waiting...");
         PROCESS_YIELD();
 
         if ((ev == PROCESS_EVENT_TIMER && data == &register_timer) || ev == PROCESS_EVENT_POLL)
@@ -85,7 +86,7 @@ PROCESS_THREAD(coap_client, ev, data)
 
                 coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
                 coap_set_header_uri_path(request, (const char *)&SERVER_REGISTRATION);
-                char msg[255];
+                char msg[300];
                 strcpy(msg, "{\"Resource\":\"poison_resource\"}");
 
                 printf("MSG registration coap_node : %s\n", msg);
@@ -126,17 +127,17 @@ PROCESS_THREAD(sensor_node, ev, data)
 
         if (ev == PROCESS_EVENT_TIMER && data == &simulation && !btnPressed)
         {
-            printf("Poisonous Gas sensed\n");
+            printf("Trigger Gas...\n");
             poison_sensor.trigger();
             etimer_set(&simulation, CLOCK_SECOND * SIMULATION_INTERVAL);
         }
-        if (ev == button_hal_press_event)
+        if ((ev == button_hal_press_event))
         {
             if (registered)
             {
                 if (!btnPressed)
                 {
-                    printf("Button Pressed...\n");
+                    printf("Button has been pressed...\n");
                     btn = (button_hal_button_t *)data;
                     printf("Release Event (%s)\n", BUTTON_HAL_GET_DESCRIPTION(btn));
                     btnPressed = true;
