@@ -80,27 +80,20 @@ PROCESS_THREAD(coap_client, ev, data)
 
         if ((ev == PROCESS_EVENT_TIMER && data == &register_timer) || ev == PROCESS_EVENT_POLL)
         {
-            if (NETSTACK_ROUTING.node_is_reachable() && NETSTACK_ROUTING.get_root_ipaddr(&dest_ipaddr))
-            {
-                printf("Registration phase\n");
+            printf("Registration phase\n");
 
-                coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
-                coap_set_header_uri_path(request, (const char *)&SERVER_REGISTRATION);
-                char msg[300];
-                strcpy(msg, "{\"Resource\":\"poison_resource\"}");
+            coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
+            coap_set_header_uri_path(request, (const char *)&SERVER_REGISTRATION);
+            char msg[300];
+            strcpy(msg, "{\"Resource\":\"poison_resource\"}");
 
-                printf("MSG registration coap_node : %s\n", msg);
-                coap_set_payload(request, (uint8_t *)msg, strlen(msg));
-                COAP_BLOCKING_REQUEST(&server_ep, request, response_handler);
-                registered = true;
-                leds_toggle(LEDS_GREEN);
-                break;
-            }
-
-            else
-            {
-                printf("No RPL Address Received...\n");
-            }
+            printf("MSG registration coap_node : %s\n", msg);
+            coap_set_payload(request, (uint8_t *)msg, strlen(msg));
+            COAP_BLOCKING_REQUEST(&server_ep, request, response_handler);
+            registered = true;
+            leds_toggle(LEDS_GREEN);
+            break;
+            
             etimer_reset(&register_timer);
         }
     }
