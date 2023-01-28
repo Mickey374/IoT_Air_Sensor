@@ -10,10 +10,10 @@ port = 5683
 class CoAPServer(CoAP):
     def __init__(self, host, port):
         CoAP.__init__(self, (host, port), False)
-        self.add_resource("registration", AdvancedResource())
+        self.add_resource("registry", AdvancedResource())
     
 
-def test():
+def start_application():
     logging.getLogger("coapthon.server.coap").setLevel(logging.WARNING)
     logging.getLogger("coapthon.layers.messagelayer").setLevel(logging.WARNING)
     logging.getLogger("coapthon.client.coap").setLevel(logging.WARNING)
@@ -35,4 +35,4 @@ def test():
 
 
 if __name__ == '__main__':
-    test()
+    start_application()

@@ -4,145 +4,93 @@
 #include <string.h>
 #include "contiki.h"
 #include "random.h"
-#include "net/routing/routing.h"
-#include "net/netstack.h"
-#include "net/ipv6/simple-udp.h"
 #include "coap-engine.h"
 #include "coap-blocking-api.h"
 #include "sys/node-id.h"
 #include "os/dev/button-hal.h"
 #include "os/dev/serial-line.h"
 #include "os/dev/leds.h"
-// #include "node-id.h"
-// #include "dev/button-hal.h"
 
 /* Log configuration */
 #include "sys/etimer.h"
 #include "sys/log.h"
 
-#define LOG_MODULE "NODE"
-#define LOG_LEVEL LOG_LEVEL_INFO
-
-#define UDP_CLIENT_PORT 8765
-#define UDP_SERVER_PORT 5678
-
-#define SERVER_EP "coap://[fd00::1]:5683"
-#define SERVER_REGISTRATION "registration"
-
-#define SENSOR_TYPE "poison_sensor"
-#define SIMULATION_INTERVAL 30
-#define TOGGLE_INTERVAL 10
+#define LOG_MODULE "App"
+#define LOG_LEVEL LOG_LEVEL_APP
 #define TIMEOUT_INTERVAL 30
 
+#define SERVER "coap://[fd00::1]:5683"
+
 static struct etimer register_timer;
-static struct etimer simulation;
-static struct etimer timeout_timer;
-
 bool registered = false;
-bool btnPressed = false;
+static int interval = 0;
 
-extern coap_resource_t poison_sensor;
-extern coap_resource_t alert_actuator;
-
-PROCESS(coap_client, "CoAP Client");
-PROCESS(sensor_node, "Sensor node");
-AUTOSTART_PROCESSES(&coap_client, &sensor_node);
+extern int airquality_value;
 
 /*---------------------------------------------------------------------------*/
-void response_handler(coap_message_t *response)
+void client_chunk_handler(coap_message_t *response)
 {
     const uint8_t *chunk;
     if (response == NULL)
     {
-        puts("Request timed out");
+        LOG_INFO("Request timed out");
         return;
     }
+    registered = true;
     int len = coap_get_payload(response, &chunk);
     printf("|%.*s\n", len, (char *)chunk);
 }
-/*---------------------------------------------------------------------------*/
 
-PROCESS_THREAD(coap_client, ev, data)
+/*---------------------------------------------------------------------------*/
+PROCESS(node, "node");
+AUTOSTART_PROCESSES(&node);
+
+int airquality_value = 50;
+extern coap_resource_t res_airquality;
+extern coap_resource_t res_colors;
+
+PROCESS_THREAD(node, ev, data)
 {
+    // Set a seed for the random generator as the number of seconds that have elapsed since January 1, 1970
     static coap_endpoint_t server_ep;
     static coap_message_t request[1];
-    uip_ipaddr_t dest_ipaddr;
 
     PROCESS_BEGIN();
-    coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
 
-    etimer_set(&register_timer, TOGGLE_INTERVAL * CLOCK_SECOND);
+    PROCESS_PAUSE();
 
-    while (1)
-    {   
-        printf("Connection waiting...");
-        PROCESS_YIELD();
+    printf("Starting sensor node\n");
 
-        if ((ev == PROCESS_EVENT_TIMER && data == &register_timer) || ev == PROCESS_EVENT_POLL)
-        {
-            printf("Registration phase\n");
+    coap_activate_resource(&res_colors, "LEDs");
+    coap_activate_resource(&res_airquality, "aqi");
 
-            coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
-            coap_set_header_uri_path(request, (const char *)&SERVER_REGISTRATION);
-            char msg[300];
-            strcpy(msg, "{\"Resource\":\"poison_resource\"}");
+    coap_endpoint_parse(SERVER, strlen(SERVER), &server_ep);
 
-            printf("MSG registration coap_node : %s\n", msg);
-            coap_set_payload(request, (uint8_t *)msg, strlen(msg));
-            COAP_BLOCKING_REQUEST(&server_ep, request, response_handler);
-            registered = true;
-            leds_toggle(LEDS_GREEN);
-            break;
-            
-            etimer_reset(&register_timer);
-        }
-    }
-    LOG_INFO("REGISTERED\nStarting Poisonous Gas Sensor Server\n");
-    PROCESS_END();
-}
+    coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
+    coap_set_header_uri_path(request, "registry");
+    COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
-PROCESS_THREAD(sensor_node, ev, data)
-{
-    button_hal_button_t *btn;
+    printf("--Registered--\n");
 
-    PROCESS_BEGIN();
-    coap_activate_resource(&poison_sensor, "poison_resource");
-    coap_activate_resource(&alert_actuator, "alert_actuator");
-
-    btn = button_hal_get_by_index(0);
-
-    etimer_set(&simulation, CLOCK_SECOND * SIMULATION_INTERVAL);
-    LOG_INFO("Simulation Started...\n");
-
-    while (1)
+    while (!registered)
     {
-        PROCESS_YIELD();
+        printf("Retrying Connection with Server");
+        COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
+    }
 
-        if (ev == PROCESS_EVENT_TIMER && data == &simulation && !btnPressed)
+    etimer_reset(&register_timer, TIMEOUT_INTERVAL * CLOCK_SECOND)
+
+        while (1)
+    {
+        PROCESS_WAIT_EVENT();
+
+        if (ev == PROCESS_EVENT_TIMER && data == &register_timer)
         {
-            printf("Trigger Gas...\n");
-            poison_sensor.trigger();
-            etimer_set(&simulation, CLOCK_SECOND * SIMULATION_INTERVAL);
-        }
-        if ((ev == button_hal_press_event))
-        {
-            if (registered)
-            {
-                if (!btnPressed)
-                {
-                    printf("Button has been pressed...\n");
-                    btn = (button_hal_button_t *)data;
-                    printf("Release Event (%s)\n", BUTTON_HAL_GET_DESCRIPTION(btn));
-                    btnPressed = true;
-                    etimer_set(&timeout_timer, TIMEOUT_INTERVAL * CLOCK_SECOND);
-                }
-                else
-                {
-                    etimer_stop(&timeout_timer);
-                    printf("Stop Extractor\n");
-                    btnPressed = false;
-                }
-            }
+            // returns a random integer between 0 and
+            airquality_value = rand() % 201;
+            res_airquality.trigger();
+            interval++;
+            etimer_reset(&register_timer);
         }
     }
     PROCESS_END();

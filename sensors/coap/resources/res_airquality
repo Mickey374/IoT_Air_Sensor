@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <string.h>
+#include "coap-engine.h"
+#include <stdio.h>
+#include "coap-observe.h"
+
+
+extern int airquality_value;
+
+
+static void res_get_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
+static void res_event_handler(void);
+
+EVENT_RESOURCE(res_airquality,
+	"title=\"Air Sensor Detector\";obs;rt=\"ASD\"",
+	res_get_handler,
+	NULL,
+	NULL,
+	NULL,
+	res_event_handler);
+
+static void res_get_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
+{
+    //Construct a JSON message as a resource and send using this function
+    unsigned int check = -1;
+    coap_get_header_accept(request, &check);
+
+    if (accept == -1 || accept == APLICATION_JSON)
+    {
+        coap_set_header_content_format(response, APPLICATION_JSON);
+        char buffer[COAP_MAX_CHUNK_SIZE];
+        snprintf(buffer, sizeof(buffer), "{\"aqi\": %d, \"timestamp\": %lu}", airquality_value, clock_seconds());
+        coap_set_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
+    }
+    else
+    {
+        coap_set_status_code(response, NOT_ACCEPTABLE_4_06);
+		const char *msg = "Supporting content-type application/json";
+   		 coap_set_payload(response, msg, strlen(msg));
+    }
+}
+
+static void res_event_handler(void){
+	coap_notify_observers(&res_airquality);
+}

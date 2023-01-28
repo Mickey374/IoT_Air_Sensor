@@ -9,8 +9,7 @@ from coapthon.client.helperclient import HelperClient
 from coapthon.messages.request import Request
 from coapthon.messages.response import Response
 from coapthon import defines
-from alert_resource import AlertResource
-from poisonous_resource import PoisonResource
+from node_resource import NodeResource
 
 class AdvancedResource(Resource):
     def __init__(self, name="Advanced"):
@@ -18,33 +17,14 @@ class AdvancedResource(Resource):
         self.payload = "Advanced Resource"
     
     def render_GET_advanced(self, request, response):
-        print("GET Server message: \n", request.payload)
-
-        moteInfo = json.loads(request.payload)
-        response.payload = self.payload
-
-        response.max_age = 20
-        response.code = defines.Codes.CONTENT.number
-
-        moteInfo["Source"] = request.source
-        motionResource = PoisonResource(moteInfo["Source"], moteInfo["Resource"])
-        return self, response
-    
-
-class AdvancedResourceAlert(Resource):
-    def __init__(self, name="AdvancedAlert"):
-        super(AdvancedResourceAlert, self).__init__(name)
-        self.payload = "Registration Successful"
-    
-    def render_GET_advanced(self, request, response):
-        print("GET Server message: \n", request.payload)
-
-        moteInfo = json.loads(request.payload)
-        response.payload = self.payload
-
-        response.max_age = 20
-        response.code = defines.Codes.CONTENT.number
-
-        moteInfo["Source"] = request.source
-        alertResource = AlertResource(moteInfo["Source"], moteInfo["Resource"])
-        return self, response
+        
+        if request.payload is None:
+            print("Empty Payload")
+            return self, None
+        else:
+            nodeInfo = json.loads(request.payload)
+            response.payload = self.payload
+            response.max_age = 20
+            response.code = defines.Codes.CONTENT.number
+            nodeResource = NodeResource(request.source)
+            return self, response
