@@ -67,17 +67,16 @@ PROCESS_THREAD(node, ev, data)
 
     coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
     coap_set_header_uri_path(request, "registry");
-    COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
-    printf("--Registered--\n");
 
     while (!registered)
     {
-        printf("Retrying Registration with Server");
+        printf("Retrying Registration with Server..\n");
         COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
     }
 
-    etimer_reset(&register_timer, 30 * CLOCK_SECOND);
+    printf("--Registered--\n");
+    etimer_reset(&register_timer, 30*CLOCK_SECOND);
 
         while (1)
     {
