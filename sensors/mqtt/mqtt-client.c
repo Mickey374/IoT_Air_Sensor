@@ -121,7 +121,7 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
   {
   case MQTT_EVENT_CONNECTED:
   {
-    printf("Application has a MQTT connection\n");
+    printf("Application has an MQTT connection\n");
     state = STATE_CONNECTED;
     break;
   }

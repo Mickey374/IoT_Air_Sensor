@@ -16,8 +16,7 @@
 #include "sys/log.h"
 
 #define LOG_MODULE "App"
-#define LOG_LEVEL LOG_LEVEL_APP
-#define TIMEOUT_INTERVAL 30
+#define LOG_LEVEL LOG_LEVEL_DBG
 
 #define SERVER "coap://[fd00::1]:5683"
 
@@ -36,7 +35,9 @@ void client_chunk_handler(coap_message_t *response)
         LOG_INFO("Request timed out");
         return;
     }
-    registered = true;
+    if(!registered){
+        registered = true;
+    }
     int len = coap_get_payload(response, &chunk);
     printf("|%.*s\n", len, (char *)chunk);
 }
@@ -57,8 +58,6 @@ PROCESS_THREAD(node, ev, data)
 
     PROCESS_BEGIN();
 
-    PROCESS_PAUSE();
-
     printf("Starting sensor node\n");
 
     coap_activate_resource(&res_colors, "LEDs");
@@ -74,11 +73,11 @@ PROCESS_THREAD(node, ev, data)
 
     while (!registered)
     {
-        printf("Retrying Connection with Server");
+        printf("Retrying Registration with Server");
         COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
     }
 
-    etimer_reset(&register_timer, TIMEOUT_INTERVAL * CLOCK_SECOND)
+    etimer_reset(&register_timer, 30 * CLOCK_SECOND);
 
         while (1)
     {
