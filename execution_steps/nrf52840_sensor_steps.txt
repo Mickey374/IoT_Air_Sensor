@@ -1,0 +1,44 @@
+To Run the Project of the Air Sensor on Nordic RF5284 sensors, it is important to flash the codes on the Contikier OS platform. Follow the rules below:
+=====================================================
+
+1. Check Ports availability with the command and find [ /dev/ttyACM0,  /dev/ttyACM1,  /dev/ttyACM2]
+	ls /dev/tty*
+
+2. Cd into the project on the contikier platform after having run
+	contikier
+
+3. Cd examples/IoT_Air_Sensor/sensors/rpl-border-router and run the code to flash on sensor[Port 0]
+	make TARGET=nrf52840 BOARD=dongle border-router.dfu-upload PORT=/dev/ttyACM0
+
+4. cd into mqtt and flash unto sensor
+	make TARGET=nrf52840 BOARD=dongle mqtt-client.dfu-upload PORT=/dev/ttyACM1
+
+5. cd into coap and flash unto sensor
+	make TARGET=nrf52840 BOARD=dongle coap_node.dfu-upload PORT=/dev/ttyACM2
+
+6. After flashing, reconnect the sensors unto the osboxes VM and open different terminals and run the ff for all sensors
+	Open the Terminal and Run: sudo mosquitto -c /etc/mosquitto/mosquitto.conf
+	Border ROuter: make TARGET=nrf52840 BOARD=dongle connect-router PORT=/dev/ttyACM0
+	MQTT Sensor: make TARGET=nrf52840 BOARD=dongle login PORT=/dev/ttyACM1
+	COAP Sensor: make TARGET=nrf52840 BOARD=dongle login PORT=/dev/ttyACM2
+
+7. Cd into the collector and run the main python file
+	sudo mosquitto -v -c /etc/mosquitto/mosquitto.conf
+
+  	Check the database/tables for data by first:
+		-mysql -u admin -p
+		use databasename;
+		show tables;
+		select * from tablename;
+		
+Use 'make distclean' if you want to build the sensor codes again
+
+
+=============COOJA COMMANDS============
+To run the Cooja environment, just do `cooja`
+
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add –
+
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+
+
