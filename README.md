@@ -43,16 +43,17 @@ For future improvement, feel free to contribute to this project by submitting bu
 
 Your contributions are valuable in enhancing the capabilities and reliability of the House Sensor Project!
 
-[//]: # (Below is an ASCII art of a house for visualization)
        /\
       /  \
      /    \
     /______\
-   |        |
-   |  ____  |
-   | |    | |
-   | |____| |
    |   __   |
-   |  |  |  |
-   |__|__|__|
+   |  |__|  |
+   |        |
+   |________|
+   |  __  __|
+   | |__||__|
+   |________|
+   |   ||   |
+   |___||___|
 
