@@ -199,7 +199,7 @@ public class Interface {
 		}
     	
 
-    	System.out.println("Humidity after regulation: " + newtemp + "\n");
+    	System.out.println("Temperature after regulation: " + newtemp + "\n");
     
     }
     
